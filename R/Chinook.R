@@ -11,10 +11,11 @@
                                 state="environment")
                                 )
 #------------------------------------------------------------------------------------------------------------------------
-setGeneric('getTabs',  signature='obj', function(obj) standardGeneric("getTabs"))
-setGeneric('createUI',      signature='obj', function(obj) standardGeneric("createUI"))
-setGeneric('createServer',  signature='obj', function(obj, session, input, output) standardGeneric("createServer"))
-setGeneric('createApp',     signature='obj', function(obj, port=NA_integer_) standardGeneric("createApp"))
+setGeneric('addTab',       signature='obj', function(obj, tab) standardGeneric("addTab"))
+setGeneric('getTabs',      signature='obj', function(obj) standardGeneric("getTabs"))
+setGeneric('createUI',     signature='obj', function(obj) standardGeneric("createUI"))
+setGeneric('createServer', signature='obj', function(obj, session, input, output) standardGeneric("createServer"))
+setGeneric('createApp',    signature='obj', function(obj, port=NA_integer_) standardGeneric("createApp"))
 #------------------------------------------------------------------------------------------------------------------------
 #' Create an Chinook object
 #'
@@ -45,6 +46,25 @@ setMethod("show", "Chinook",
         })
 
 #------------------------------------------------------------------------------------------------------------------------
+#' add a ChinookTab subclass to this Chinook instance
+#'
+#' @rdname addTab
+#'
+#' @param obj  A Chinook object
+#' @param tab  A ChinookTab object
+#'
+#' @return nothing
+#'
+#' @export
+#'
+
+setMethod("addTab", "Chinook",
+
+    function(obj, tab){
+       obj@state$tabs <- c(obj@state$tabs, tab)
+       })
+
+#------------------------------------------------------------------------------------------------------------------------
 #' get all the tabs associated with this Chinook instance
 #'
 #' @rdname getTabs
@@ -63,33 +83,45 @@ setMethod("getTabs", "Chinook",
        })
 
 #------------------------------------------------------------------------------------------------------------------------
-.createSidebar <- function()
+.createSidebar <- function(obj)
 {
+   menuItems <- list()
+   i <- 1
+   menuItems[[i]] <- menuItem("Home", tabName="mainTab")
+
+   for(tab in obj@state$tabs){
+      i <- i + 1
+      menuItems[[i]] <- menuItem(getMenuItemName(tab), tabName=getName(tab))
+      } # for tab
+
+   printf("wish to add menuItems for %d tabs", length(obj@state$tabs))
+
    dashboardSidebar(
-   sidebarMenu(id="sidebarMenu",
-       menuItem("Home",              tabName = "mainTab")
-       )
-    )
+      sidebarMenu(id="sidebarMenu", menuItems)
+      )
 
 } # .createSidebar
 #------------------------------------------------------------------------------------------------------------------------
-.createBody <- function()
+.createBody <- function(obj)
 {
-   dashboardBody(
-      useShinyjs(),
-      tabItems(
-         .createMainTab()
-         ))
+  mainPageTabItem <- tabItem(tabName="mainTab", h3("Chinook: placeholder for introduction page"))
 
-} # .createBody
-#------------------------------------------------------------------------------------------------------------------------
-.createMainTab <- function()
-{
-  tabItem(tabName="mainTab",
-     h3("Chinook: placeholder for introduction page")
+  tabItemList <- list()
+  i <- 1
+  tabItemList[[i]] <- mainPageTabItem
+
+
+  for(tab in obj@state$tabs){
+     nextItem <- tabItem(tabName=getName(tab), createPage(tab))
+     i <- i + 1
+     tabItemList[[i]] <- nextItem
+     }
+
+   dashboardBody(
+     do.call(tabItems, tabItemList)
      )
 
-} # .createMainTab
+} # .createBody
 #------------------------------------------------------------------------------------------------------------------------
 #' Create the user interface
 #'
@@ -106,9 +138,9 @@ setMethod('createUI', 'Chinook',
 
       ui <- dashboardPage(
          dashboardHeader(title="Chinook devel"),
-         .createSidebar(),
-         .createBody()
-         ) # dashboardPage
+         .createSidebar(obj),
+         .createBody(obj)
+         )
 
       return(ui)
      })
@@ -153,10 +185,10 @@ setMethod('createApp', 'Chinook',
 
     shinyOptions=list(launch.browser=FALSE, host='0.0.0.0', port=port)
 
-    app <- shinyApp(createUI(obj), server, options=shinyOptions)
+    ui <- createUI(obj)
+    app <- shinyApp(ui, server, options=shinyOptions)
 
     return(app)
-
     })
 
 #------------------------------------------------------------------------------------------------------------------------

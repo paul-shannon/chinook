@@ -1,7 +1,7 @@
 Package: Chinook
 Title: Chinook
 Date: 2020-04-30
-Version: 1.0.0
+Version: 1.0.1
 Author: Paul Shannon
 Maintainer: Paul Shannon <pshannon@systemsbiology.org>
 Description: An ecosystem of message passing tabs on top of RStudio's shiny.

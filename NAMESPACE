@@ -2,7 +2,12 @@
 
 export(Chinook)
 export(ChinookTab)
+export(DemoTabOne)
+export(DemoTabTwo)
+exportMethods(addTab)
 exportMethods(createApp)
 exportMethods(createServer)
 exportMethods(createUI)
+exportMethods(getMenuItemName)
+exportMethods(getName)
 exportMethods(getTabs)

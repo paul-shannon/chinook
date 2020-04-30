@@ -4,6 +4,8 @@ library(RUnit)
 runTests <- function()
 {
    test_constructor()
+   test_DemoTabOne()
+   test_DemoTabTwo()
 
 } # runTests
 #----------------------------------------------------------------------------------------------------
@@ -21,6 +23,43 @@ test_minimalAppNoTabs <- function()
     x <- Chinook("demo")
     createApp(x, 10001)
     checkEquals(length(getTabs(x)), 0)
+
+} # test_constructor
+#----------------------------------------------------------------------------------------------------
+test_DemoTabOne <- function()
+{
+   message(sprintf("--- test_DemoTabOne"))
+
+   c <- Chinook("demo")
+   t <- DemoTabOne(name="tabOne", menuItemName="One", parentApp=c)
+   checkTrue(all(c("ChinookTab", "DemoTabOne") %in% is(t)))
+
+} # test_DemoTabOne
+#----------------------------------------------------------------------------------------------------
+test_DemoTabTwo <- function()
+{
+   message(sprintf("--- test_DemoTabTwo"))
+
+   c <- Chinook("demo")
+   t <- DemoTabTwo(name="tabTwo", menuItemName="Two", parentApp=c)
+   checkTrue(all(c("ChinookTab", "DemoTabTwo") %in% is(t)))
+
+} # test_constructor
+#----------------------------------------------------------------------------------------------------
+test_runWithemoTabOne <- function()
+{
+   message(sprintf("--- test_runWithDemoTabOne"))
+
+   c <- Chinook("demo")
+   t.1 <- DemoTabOne(name="tabOne", menuItemName="One", parentApp=c)
+   t.2 <- DemoTabTwo(name="tabTwo", menuItemName="Two", parentApp=c)
+
+   addTab(c, t.1)
+   addTab(c, t.2)
+
+   createApp(c, 10001)
+
+   checkTrue(all(c("ChinookTab", "DemoTabOne") %in% is(t)))
 
 } # test_constructor
 #----------------------------------------------------------------------------------------------------

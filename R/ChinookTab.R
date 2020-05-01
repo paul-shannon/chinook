@@ -20,6 +20,8 @@ setGeneric("createPage",       signature="obj", function(obj) standardGeneric("c
 setGeneric("displayPage",      signature="obj", function(obj, tf) standardGeneric("displayPage"))
 setGeneric("addEventHandlers", signature="obj", function(obj, session, input, output)
                                standardGeneric("addEventHandlers"))
+setGeneric("handleMessage",    signature="obj", function(obj, source, destination, cmd, json.payload)
+                               standardGeneric("handleMessage"))
 #------------------------------------------------------------------------------------------------------------------------
 #' Create an ChinookTab object
 #'

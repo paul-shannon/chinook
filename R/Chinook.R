@@ -1,21 +1,27 @@
 #' import shiny
+#' import jsonlite
 #'
 #' @name Chinook
 #' @rdname Chinook
 #' @aliases Chinook
 #------------------------------------------------------------------------------------------------------------------------
-.Chinook <- setClass("Chinook",
-                             representation = representation(
-                                quiet="logical",
-                                name="character",
-                                state="environment")
-                                )
+printf <- function(...) print(noquote(sprintf(...)))
 #------------------------------------------------------------------------------------------------------------------------
-setGeneric('addTab',       signature='obj', function(obj, tab) standardGeneric("addTab"))
-setGeneric('getTabs',      signature='obj', function(obj) standardGeneric("getTabs"))
-setGeneric('createUI',     signature='obj', function(obj) standardGeneric("createUI"))
-setGeneric('createServer', signature='obj', function(obj, session, input, output) standardGeneric("createServer"))
-setGeneric('createApp',    signature='obj', function(obj, port=NA_integer_) standardGeneric("createApp"))
+.Chinook <- setClass("Chinook",
+                       representation = representation(
+                           quiet="logical",
+                           name="character",
+                           state="environment")
+                           )
+#------------------------------------------------------------------------------------------------------------------------
+setGeneric('addTab',          signature='obj', function(obj, tab) standardGeneric("addTab"))
+setGeneric('getTabs',         signature='obj', function(obj) standardGeneric("getTabs"))
+setGeneric('createUI',        signature='obj', function(obj) standardGeneric("createUI"))
+setGeneric('createServer',    signature='obj', function(obj, session, input, output)
+                                standardGeneric("createServer"))
+setGeneric('createApp',       signature='obj', function(obj, port=NA_integer_) standardGeneric("createApp"))
+setGeneric('dispatchMessage', signature='obj', function(obj, source, destination, cmd, json.payload)
+                                standardGeneric("dispatchMessage"))
 #------------------------------------------------------------------------------------------------------------------------
 #' Create an Chinook object
 #'
@@ -113,7 +119,6 @@ setMethod("getTabs", "Chinook",
   if(!is.na(obj@state$homePage))
     mainTabContent <- includeHTML(obj@state$homePage)
 
-  browser()
   mainPageTabItem <- tabItem(tabName="mainTab", mainTabContent)
                               # includeHTML(obj@state$homePage))
   tabItemList <- list()
@@ -191,7 +196,11 @@ setMethod('createApp', 'Chinook',
 
     server <- function(session, input, output){
        x <- createServer(obj, session, input, output)
-       }
+       for(tab in obj@state$tabs){
+         printf("server adding event handlers for %s", getName(tab))
+         addEventHandlers(tab, session, input, output)
+         }
+       } # server
 
     shinyOptions=list(launch.browser=FALSE, host='0.0.0.0', port=port)
 
@@ -200,5 +209,23 @@ setMethod('createApp', 'Chinook',
 
     return(app)
     })
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod('dispatchMessage', signature='Chinook',
+
+    function(obj, source, destination, cmd, json.payload){
+
+      printf("--- Chinook::dispatchMessage")
+      printf("  source: %s", source)
+      printf("  destination: %s", destination)
+      printf("  cmd: %s", cmd)
+      printf("  payload: %s", json.payload)
+      for(tab in obj@state$tabs){
+        if(tolower(destination) == tolower(getName(tab))){
+           printf("will send to %s", destination)
+           handleMessage(tab, source, destination, cmd, json.payload)
+           }
+        }
+      })
 
 #------------------------------------------------------------------------------------------------------------------------

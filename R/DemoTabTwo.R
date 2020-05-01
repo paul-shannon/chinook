@@ -43,11 +43,12 @@ setMethod("createPage", "DemoTabTwo",
       fluidPage(id="uppercaseViewPageContent",
          fluidRow(
             wellPanel(
-              h3("UpperCaseView"),
+              h3(getName(obj),
               selectInput("selectUpperCaseLetter", "Select", LETTERS, width="200px"),
               selectInput("selectUpperCaseMessageDestination", "Send to",
-                          c(" ", "UpperCase"), width="200px"),
-              style="background-color: beige"
+                          c("-", "DemoTabOne"), width="200px"),
+              actionButton("demoTabTwoSendButton", "Send"),
+              style="background-color: beige")
               )
            )) # fluidPage
           }) # createPage
@@ -69,8 +70,26 @@ setMethod("addEventHandlers", "DemoTabTwo",
       obj@state$input <- input
       obj@state$output <- output
 
-      output$uppercaseValue <- renderText({input$uppercaseCaption})
+      observeEvent(input$demoTabTwoSendButton, ignoreInit=TRUE, {
+         destination <- isolate(input$selectUpperCaseMessageDestination)
+         payload <- isolate(input$selectUpperCaseLetter)
+         if(destination != "-"){
+           printf(" send to: %s", destination)
+           dispatchMessage(obj@parentApp, obj@name, destination, "defaultOperation",
+                           jsonlite::toJSON(payload, auto_unbox=TRUE))
+            } # if destination
+         }) # button event
+
+
 
       }) # addEventHandlers
+
+#------------------------------------------------------------------------------------------------------------------------
+setMethod("handleMessage", "DemoTabTwo",
+
+     function(obj, source, destination, cmd, json.payload){
+         printf("%s has message from %s, %s(%s)", getName(obj), source, cmd,
+                jsonlite::fromJSON(json.payload))
+        })
 
 #------------------------------------------------------------------------------------------------------------------------

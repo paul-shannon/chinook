@@ -54,8 +54,8 @@ test_twoTabDemo <- function()
    checkTrue(file.exists(homePage))
 
    c <- Chinook("demo", homePage)
-   t.1 <- DemoTabOne(name="tabOne", menuItemName="One", parentApp=c)
-   t.2 <- DemoTabTwo(name="tabTwo", menuItemName="Two", parentApp=c)
+   t.1 <- DemoTabOne(name="DemoTabOne", menuItemName="One", parentApp=c)
+   t.2 <- DemoTabTwo(name="DemoTabTwo", menuItemName="Two", parentApp=c)
 
    addTab(c, t.1)
    addTab(c, t.2)

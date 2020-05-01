@@ -30,10 +30,14 @@ setGeneric('createApp',    signature='obj', function(obj, port=NA_integer_) stan
 #'
 #' @export
 #'
-Chinook <- function(name, quiet=TRUE)
+Chinook <- function(name, homePage.htmlFile=NA, quiet=TRUE)
 {
    state <- new.env(parent=emptyenv())
    state$tabs <- list()
+   if(!is.na(homePage.htmlFile))
+      stopifnot(file.exists(homePage.htmlFile))
+
+   state$homePage <- homePage.htmlFile
    .Chinook(name=name, state=state, quiet=quiet)
 
 } # Chinook
@@ -104,8 +108,14 @@ setMethod("getTabs", "Chinook",
 #------------------------------------------------------------------------------------------------------------------------
 .createBody <- function(obj)
 {
-  mainPageTabItem <- tabItem(tabName="mainTab", h3("Chinook: placeholder for introduction page"))
+  mainTabContent <-  "<h3> Chinook Home Page</h3>"
 
+  if(!is.na(obj@state$homePage))
+    mainTabContent <- includeHTML(obj@state$homePage)
+
+  browser()
+  mainPageTabItem <- tabItem(tabName="mainTab", mainTabContent)
+                              # includeHTML(obj@state$homePage))
   tabItemList <- list()
   i <- 1
   tabItemList[[i]] <- mainPageTabItem

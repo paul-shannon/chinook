@@ -46,11 +46,14 @@ test_DemoTabTwo <- function()
 
 } # test_constructor
 #----------------------------------------------------------------------------------------------------
-test_runWithemoTabOne <- function()
+test_twoTabDemo <- function()
 {
-   message(sprintf("--- test_runWithDemoTabOne"))
+   message(sprintf("--- test_twoTabDemo"))
 
-   c <- Chinook("demo")
+   homePage <- system.file(package="Chinook", "extdata", "demoHomePage.html")
+   checkTrue(file.exists(homePage))
+
+   c <- Chinook("demo", homePage)
    t.1 <- DemoTabOne(name="tabOne", menuItemName="One", parentApp=c)
    t.2 <- DemoTabTwo(name="tabTwo", menuItemName="Two", parentApp=c)
 

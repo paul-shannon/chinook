@@ -6,7 +6,7 @@
 \alias{.Chinook}
 \title{import shiny}
 \usage{
-Chinook(name, quiet = TRUE)
+Chinook(name, homePage.htmlFile = NA, quiet = TRUE)
 }
 \arguments{
 \item{name}{A character string}
